@@ -6,6 +6,11 @@ class CodeEvaluator:
         # 🔐 Read Hugging Face token from environment variable
         token = os.getenv("HUGGINGFACE_TOKEN")
 
+    # log print(f"Using token: {token}")  # For debugging purposes only; remove in production
+        if not token:
+            raise ValueError("HUGGINGFACE_TOKEN environment variable not set.")
+        
+
         # ✅ Authenticated access to gated model
         self.tokenizer = AutoTokenizer.from_pretrained(
             "bigcode/starcoder", use_auth_token=token
