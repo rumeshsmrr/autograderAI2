@@ -1,16 +1,20 @@
+import os
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 class CodeEvaluator:
     def __init__(self):
-        # Load a larger model like StarCoder or GPT-4
-        self.tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoder")  # Or "codellama/CodeLlama-7b-hf"
-        self.model = AutoModelForCausalLM.from_pretrained("bigcode/starcoder")  # Or "codellama/CodeLlama-7b-hf"
+        # 🔐 Read Hugging Face token from environment variable
+        token = os.getenv("HUGGINGFACE_TOKEN")
+
+        # ✅ Authenticated access to gated model
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            "bigcode/starcoder", use_auth_token=token
+        )
+        self.model = AutoModelForCausalLM.from_pretrained(
+            "bigcode/starcoder", use_auth_token=token
+        )
 
     def evaluate_criterion(self, ref_code, answer_code, criterion, max_score):
-        """
-        Evaluate a single criterion using a large generative AI model.
-        Returns a score and feedback.
-        """
         prompt = (
             f"Analyze the following Java code and evaluate the criterion: {criterion}\n\n"
             f"Reference Code:\n{ref_code}\n\n"
@@ -25,27 +29,22 @@ class CodeEvaluator:
         outputs = self.model.generate(**inputs, max_length=512)
         raw_output = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-        # Parse the output
         try:
             score_str = raw_output.split("Score:")[-1].strip().split()[0]
             score = int(score_str)
         except:
-            score = 0  # Default to 0 if score extraction fails
+            score = 0
 
         feedback = raw_output.strip()
         return score, feedback
 
     def evaluate_submission(self, ref_code, answer_code, rubric):
-        """
-        Evaluate the student's submission based on the dynamic rubric.
-        """
         result = {
             "total_score": 0,
             "grades": {},
             "feedback": {}
         }
 
-        # Evaluate each criterion in the rubric
         for criterion, max_score in rubric.items():
             score, feedback = self.evaluate_criterion(ref_code, answer_code, criterion, max_score)
             result["grades"][criterion] = score
