@@ -28,16 +28,16 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/model:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/autograder2:latest
 
-      # - name: Configure AWS CLI
-      #   run: |
-      #     aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws configure set region eu-north-1  # Change this to your AWS region
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set region eu-north-1  # Change this to your AWS region
 
-      # - name: Force ECS Deployment with New Image
-      #   run: |
-      #     aws ecs update-service --cluster programingAutograderAi \
-      #       --service programingAiservice2 \
-      #       --force-new-deployment
+      - name: Force ECS Deployment with New Image
+        run: |
+          aws ecs update-service --cluster programingAutograderAi \
+            --service programingAiservice2 \
+            --force-new-deployment

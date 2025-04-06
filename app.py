@@ -17,5 +17,10 @@ def evaluate():
     result = evaluator.evaluate_submission(ref_code, answer_code, rubric)
     return jsonify({"status": "success", "result": result})
 
+# ✅ Health check endpoint
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "healthy"}), 200
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
